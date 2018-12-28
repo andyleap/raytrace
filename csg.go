@@ -6,13 +6,27 @@ import (
 )
 
 type Hit struct {
-	Color  color.Color
+	Ambient color.Color
+
+	Diffusions []Diffusion
+	
 	Normal Vector
+}
+
+type Diffusion struct {
+	Scatter float64
+	Color color.Color
 }
 
 type HitTest func(Vector) (float64, Hit)
 
-var HitDefault = Hit{Color: color.White}
+var HitDefault = Hit{Ambient: color.RGBA{0,0,0,0}}
+
+func Uniform() HitTest {
+	return func(pos Vector) (float64, Hit) {
+		return 1, HitDefault
+	}
+}
 
 func Sphere(radius float64) HitTest {
 	return func(pos Vector) (float64, Hit) {
@@ -23,16 +37,6 @@ func Sphere(radius float64) HitTest {
 	}
 }
 
-// 2 - 3 = -1
-// 3 - 2 = 1
-// 6 - 4 = 2
-// 4 - 6 = -2
-
-// -10 - 2 =
-
-// -5 - 95 = -100
-//
-
 func Box(size Vector) HitTest {
 	b1 := size.Scale(0.5)
 	b2 := size.Scale(-0.5)
@@ -40,7 +44,6 @@ func Box(size Vector) HitTest {
 		p1 := pos.Sub(b2)
 		p2 := b1.Sub(pos)
 		h := HitDefault
-
 		d := p1.X
 		h.Normal = Vector{1, 0, 0}
 		if p2.X < d {
@@ -64,6 +67,17 @@ func Box(size Vector) HitTest {
 			h.Normal = Vector{0, 0, -1}
 		}
 		return d, h
+	}
+}
+
+func Cylinder(radius float64, height float64) HitTest {
+	return func(pos Vector) (float64, Hit {
+		d := math.Abs(pos.Y) - height/2
+		h := HitDefault
+		h.Normal = Vector{math.Signbit(1, pos.Y), 0, 0}
+		
+		
+		
 	}
 }
 
@@ -96,13 +110,13 @@ func Intersect(hts ...HitTest) HitTest {
 func Subtract(ht HitTest, hts ...HitTest) HitTest {
 	return func(pos Vector) (float64, Hit) {
 		d, h := ht(pos)
-		c := h.Color
 		i := false
 		for _, ht := range hts {
 			newd, newh := ht(pos)
-			newh.Color = c
-			if newd < d || !i {
-				d, h = newd, newh
+			newd = -newd
+			if newd > d || (!i && newd < 0) {
+				d = newd
+				h.Normal = newh.Normal
 				i = true
 			}
 		}
@@ -110,10 +124,26 @@ func Subtract(ht HitTest, hts ...HitTest) HitTest {
 	}
 }
 
-func Color(c color.Color, ht HitTest) HitTest {
+func Specular(c color.Color, ht HitTest) HitTest {
 	return func(pos Vector) (float64, Hit) {
 		d, h := ht(pos)
-		h.Color = c
+		h.Diffusions = append(h.Diffusions, Diffusion{Scatter: 0, Color: c})
+		return d, h
+	}
+}
+
+func Diffuse(c color.Color, scatter float64, ht HitTest) HitTest {
+	return func(pos Vector) (float64, Hit) {
+		d, h := ht(pos)
+		h.Diffusions = append(h.Diffusions, Diffusion{Scatter: scatter, Color: c})
+		return d, h
+	}
+}
+
+func Ambient(c color.Color, ht HitTest) HitTest {
+	return func(pos Vector) (float64, Hit) {
+		d, h := ht(pos)
+		h.Ambient = c
 		return d, h
 	}
 }
