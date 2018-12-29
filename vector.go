@@ -32,6 +32,10 @@ func (v Vector) Normalize() Vector {
 	return v.Scale(1.0 / math.Sqrt(v.Dot(v)))
 }
 
+func (v Vector) Length() float64 {
+	return math.Sqrt(v.Dot(v))
+}
+
 func (v Vector) Rotate(axis Vector, angle float64) Vector {
 	c, s := math.Cos(angle), math.Sin(angle)
 	return Vector{

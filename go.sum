@@ -8,6 +8,8 @@ github.com/BurntSushi/xgbutil v0.0.0-20160919175755-f7c97cef3b4e h1:4ZrkT/RzpnRO
 github.com/BurntSushi/xgbutil v0.0.0-20160919175755-f7c97cef3b4e/go.mod h1:uw9h2sd4WWHOPdJ13MQpwK5qYWKYDumDqxWWIknEQ+k=
 github.com/andyleap/tinyfb v0.0.0-20181227174951-b53addf6a62e h1:2r7U3t3YX4YswYhyTYYED7/ppxCPCXN+g5TLGjPzGWg=
 github.com/andyleap/tinyfb v0.0.0-20181227174951-b53addf6a62e/go.mod h1:FA2IRnynJITTL6Un4xU3Icbgwk0ThqSPN50Cbwl1L8s=
+github.com/andyleap/tinyfb v0.0.0-20181228050533-76c27d003c60 h1:7XO0uwJ/+ppBaFPeU0tQqryLbIZdZBHn+78X7NozQHc=
+github.com/andyleap/tinyfb v0.0.0-20181228050533-76c27d003c60/go.mod h1:FA2IRnynJITTL6Un4xU3Icbgwk0ThqSPN50Cbwl1L8s=
 golang.org/x/exp v0.0.0-20181221233300-b68661188fbf h1:rK+9ETFkUX8OofKNLhik8qEGY/3gnM5x4eVNWJf1z/8=
 golang.org/x/exp v0.0.0-20181221233300-b68661188fbf/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/image v0.0.0-20181116024801-cd38e8056d9b h1:VHyIDlv3XkfCa5/a81uzaoDkHH4rr81Z62g+xlnO8uM=

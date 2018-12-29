@@ -9,18 +9,18 @@ type Hit struct {
 	Ambient color.Color
 
 	Diffusions []Diffusion
-	
+
 	Normal Vector
 }
 
 type Diffusion struct {
 	Scatter float64
-	Color color.Color
+	Color   color.Color
 }
 
 type HitTest func(Vector) (float64, Hit)
 
-var HitDefault = Hit{Ambient: color.RGBA{0,0,0,0}}
+var HitDefault = Hit{Ambient: color.RGBA{0, 0, 0, 0}}
 
 func Uniform() HitTest {
 	return func(pos Vector) (float64, Hit) {
@@ -32,7 +32,7 @@ func Sphere(radius float64) HitTest {
 	return func(pos Vector) (float64, Hit) {
 		h := HitDefault
 		d := radius - math.Sqrt(pos.Dot(pos))
-		h.Normal = pos.Normalize().Scale(math.Copysign(1, d))
+		h.Normal = pos.Normalize().Scale(-math.Copysign(1, d))
 		return d, h
 	}
 }
@@ -71,13 +71,16 @@ func Box(size Vector) HitTest {
 }
 
 func Cylinder(radius float64, height float64) HitTest {
-	return func(pos Vector) (float64, Hit {
-		d := math.Abs(pos.Y) - height/2
+	return func(pos Vector) (float64, Hit) {
+		d := height/2 - math.Abs(pos.Y)
 		h := HitDefault
-		h.Normal = Vector{math.Signbit(1, pos.Y), 0, 0}
-		
-		
-		
+		h.Normal = Vector{math.Copysign(1, pos.Y), 0, 0}
+		dr := radius - math.Sqrt(pos.X*pos.X+pos.Z*pos.Z)
+		if dr < d {
+			d = dr
+			h.Normal = Vector{pos.X, 0, pos.Z}.Normalize()
+		}
+		return d, h
 	}
 }
 
@@ -110,14 +113,14 @@ func Intersect(hts ...HitTest) HitTest {
 func Subtract(ht HitTest, hts ...HitTest) HitTest {
 	return func(pos Vector) (float64, Hit) {
 		d, h := ht(pos)
-		i := false
 		for _, ht := range hts {
 			newd, newh := ht(pos)
-			newd = -newd
-			if newd > d || (!i && newd < 0) {
-				d = newd
-				h.Normal = newh.Normal
-				i = true
+			if newd > 0 {
+				newd = -newd
+				if newd < d {
+					d = newd
+					h.Normal = newh.Normal.Scale(-1)
+				}
 			}
 		}
 		return d, h
