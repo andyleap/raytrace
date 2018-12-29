@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	width  = 1024 * 1
-	height = 768 * 1
+	width  = 1024 * 3
+	height = 768 * 3
 )
 
 func CheckerBoard(pos Vector) (float64, Hit) {
@@ -46,13 +46,11 @@ func main() {
 		geom := Union(
 			Translate(Vector{0, -10, 0}, CheckerBoard),
 			Translate(Vector{0, 0, 15},
-				Specular(color.NRGBA{255, 255, 255, 200}, Ambient(color.NRGBA{255, 255, 255, 128},
-					Subtract(Sphere(5),
-						Cylinder(2.5, 11),
-						RotateX(math.Pi/2, Cylinder(2.5, 11)),
-						RotateZ(math.Pi/2, Cylinder(2.5, 11)),
-					),
-				)),
+				Subtract(Specular(color.NRGBA{255, 255, 255, 200}, Ambient(color.NRGBA{255, 255, 255, 128}, Sphere(5))),
+					Ambient(color.NRGBA{255, 255, 255, 128}, Cylinder(2.5, 11)),
+					Ambient(color.NRGBA{255, 255, 255, 128}, RotateX(math.Pi/2, Cylinder(2.5, 11))),
+					Ambient(color.NRGBA{255, 255, 255, 128}, RotateZ(math.Pi/2, Cylinder(2.5, 11))),
+				),
 			),
 		)
 
@@ -60,6 +58,7 @@ func main() {
 			Geom: geom,
 			Lights: []Light{
 				{color.RGBA{255, 255, 255, 255}, Vector{0, 100, -50}, 150.0},
+				{color.RGBA{0, 0, 255, 255}, Vector{0, 2, 15}, 4},
 			},
 		}
 		x, y := 0, 0
@@ -89,7 +88,9 @@ func main() {
 					}
 				}
 			}
-			fmt.Println(y)
+			if y < height {
+				fmt.Println(y)
+			}
 			t.Update(i)
 			time.Sleep(100*time.Millisecond - time.Now().Sub(startTime))
 		}
@@ -168,6 +169,9 @@ func LoSTrace(start Vector, target Vector, w *World) bool {
 		d, _ := w.Geom(pos)
 		d = -d
 		if d < 0 {
+			break
+		}
+		if d < 0.01 && count > 10 {
 			break
 		}
 		if pos.Sub(target).Length() < d {

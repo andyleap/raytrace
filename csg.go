@@ -118,8 +118,8 @@ func Subtract(ht HitTest, hts ...HitTest) HitTest {
 			if newd > 0 {
 				newd = -newd
 				if newd < d {
-					d = newd
-					h.Normal = newh.Normal.Scale(-1)
+					d, h = newd, newh
+					h.Normal = h.Normal.Scale(-1)
 				}
 			}
 		}
